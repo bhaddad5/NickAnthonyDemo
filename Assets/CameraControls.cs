@@ -1,53 +1,42 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CameraControls : MonoBehaviour
 {
+	private Vector2 prevMousePos;
+
+	private const float rotSpeed = .2f;
+
 	void Start()
 	{
-		float[] distances = new float[32];
-		distances[8] = 30;
-		GetComponent<Camera>().layerCullDistances = distances;
+		prevMousePos = Input.mousePosition;
 	}
 
 	// Update is called once per frame
-	void Update()
+	void FixedUpdate()
 	{
-		float tiltChange = 0f;
-		if (Input.GetKey(KeyCode.Alpha1))
-			tiltChange = 1f;
-		if (Input.GetKey(KeyCode.Alpha2))
-			tiltChange = -1f;
+		float heightSpeedAdjuster = Mathf.Min(Mathf.Max(transform.position.y, .4f), 10f);
 
-		transform.eulerAngles += new Vector3(tiltChange, 0, 0);
+		var d = Input.GetAxis("Mouse ScrollWheel") * heightSpeedAdjuster;
+		transform.position += transform.forward * d;
 
-		if (Input.GetKey(KeyCode.Q))
-			transform.eulerAngles += new Vector3(0, -1f, 0);
-		if (Input.GetKey(KeyCode.E))
-			transform.eulerAngles += new Vector3(0, 1f, 0);
+		if (Input.GetKey(KeyCode.Mouse0))
+		{
+			Vector2 diff = (Vector2)Input.mousePosition - prevMousePos;
+
+			transform.RotateAround(Vector3.zero, new Vector3(0, 1, 0), diff.x * rotSpeed);
+			transform.RotateAround(Vector3.zero, transform.right, -diff.y * rotSpeed);
+		}
+
+		float wasdSpeed = .1f * heightSpeedAdjuster;
 
 		Vector3 camFlatForward = transform.forward;
 		camFlatForward.y = 0;
 
 		if (Input.GetKey(KeyCode.W))
-			transform.position += camFlatForward * 0.2f;
-		if (Input.GetKey(KeyCode.A))
-			transform.position += transform.right * -0.2f;
+			transform.position += camFlatForward * wasdSpeed;
 		if (Input.GetKey(KeyCode.S))
-			transform.position += camFlatForward * -0.2f;
-		if (Input.GetKey(KeyCode.D))
-			transform.position += transform.right * 0.2f;
+			transform.position -= camFlatForward * wasdSpeed;
 
-		if (Input.GetKey(KeyCode.Space))
-			transform.position += new Vector3(0, 1, 0) * 0.2f;
-		if (Input.GetKey(KeyCode.LeftControl))
-			transform.position += new Vector3(0, 1, 0) * -0.2f;
-
-		float zoom = Input.GetAxis("Mouse ScrollWheel") * 15f;
-		float newZoom = Mathf.Max(1f, transform.position.y - zoom);
-
-		transform.position = new Vector3(transform.position.x, newZoom, transform.position.z);
+		prevMousePos = Input.mousePosition;
 	}
 }
