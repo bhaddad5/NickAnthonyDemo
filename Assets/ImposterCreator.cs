@@ -19,8 +19,8 @@ public class ImposterCreator : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
-	    tex = new Texture2D(1024, 1024);
-		rt = new RenderTexture(1024, 1024, 0);
+	    tex = new Texture2D(2048, 2048);
+		rt = new RenderTexture(2048, 2048, 0);
 	    GetComponent<Camera>().targetTexture = rt;
 	    var bounds = GetHierarchyBounds(ObjToImposter);
 
